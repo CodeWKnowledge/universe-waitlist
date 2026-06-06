@@ -1,0 +1,210 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Sora', sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+
+  --color-primary: #00D084;
+  --color-primary-dark: #00C16A;
+  --color-primary-light: rgba(0, 208, 132, 0.1);
+  
+  --color-success: #00D084;
+  --color-success-dark: #00C16A;
+  --color-success-light: rgba(0, 208, 132, 0.1);
+
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-neutral-bg: #030712;
+  --color-card-bg: rgba(10, 15, 30, 0.55);
+}
+
+/* Custom Base Layer */
+@layer base {
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: 'Sora', sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.35s ease, color 0.35s ease;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--text-heading);
+  }
+}
+
+/* ─── DARK THEME (default) ─── */
+:root, [data-theme="dark"] {
+  --bg-page:          #030712;
+  --bg-surface:       rgba(10, 15, 30, 0.55);
+  --bg-surface-hover: rgba(255,255,255,0.05);
+  --border-subtle:    rgba(255,255,255,0.05);
+  --border-mid:       rgba(255,255,255,0.08);
+  --text-heading:     #ffffff;
+  --text-primary:     #f1f5f9;
+  --text-muted:       #94a3b8;
+  --text-dim:         #64748b;
+  --header-bg:        rgba(3,7,18,0.75);
+  --gradient-overlay: linear-gradient(to bottom,transparent 0%,transparent 35%,rgba(3,7,18,0.55) 65%,rgba(3,7,18,0.92) 82%,#030712 100%);
+}
+
+/* ─── LIGHT THEME ─── */
+[data-theme="light"] {
+  --bg-page:          #f1f5f9;
+  --bg-surface:       rgba(255,255,255,0.72);
+  --bg-surface-hover: rgba(0,0,0,0.04);
+  --border-subtle:    rgba(0,0,0,0.07);
+  --border-mid:       rgba(0,0,0,0.10);
+  --text-heading:     #0f172a;
+  --text-primary:     #1e293b;
+  --text-muted:       #475569;
+  --text-dim:         #64748b;
+  --header-bg:        rgba(241,245,249,0.85);
+  --gradient-overlay: linear-gradient(to bottom,transparent 0%,transparent 35%,rgba(241,245,249,0.55) 65%,rgba(241,245,249,0.95) 85%,#f1f5f9 100%);
+}
+
+/* ─── LIGHT THEME: targeted overrides ─── */
+
+/* Page background */
+[data-theme="light"] body { background-color: #f1f5f9; }
+
+/* Glass cards become white frosted in light mode */
+[data-theme="light"] .glass-card {
+  background: rgba(255,255,255,0.78) !important;
+  border-color: rgba(0,0,0,0.07) !important;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+}
+[data-theme="light"] .glass-card-hover:hover {
+  border-color: rgba(0,208,132,0.30) !important;
+  box-shadow: 0 0 24px rgba(0,208,132,0.12);
+}
+
+/* All white text → dark */
+[data-theme="light"] .text-white   { color: #0f172a !important; }
+[data-theme="light"] .text-slate-100 { color: #1e293b !important; }
+[data-theme="light"] .text-slate-200 { color: #1e293b !important; }
+[data-theme="light"] .text-slate-300 { color: #334155 !important; }
+[data-theme="light"] .text-slate-400 { color: #475569 !important; }
+[data-theme="light"] .text-slate-500 { color: #64748b !important; }
+
+/* Headings */
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5 { color: #0f172a !important; }
+
+/* Dark bg surfaces → light */
+[data-theme="light"] .bg-\[\#030712\]   { background-color: #f1f5f9 !important; }
+[data-theme="light"] .bg-slate-950\/60 { background-color: rgba(241,245,249,0.8) !important; }
+[data-theme="light"] .bg-\[\#0a0f1d\]  { background-color: #f8fafc !important; }
+[data-theme="light"] .bg-slate-900\/40 { background-color: rgba(255,255,255,0.7) !important; }
+
+/* White/opacity backgrounds → dark-on-light equivalents */
+[data-theme="light"] .bg-white\/5  { background-color: rgba(0,0,0,0.04) !important; }
+[data-theme="light"] .bg-white\/10 { background-color: rgba(0,0,0,0.06) !important; }
+
+/* Borders */
+[data-theme="light"] .border-white\/5  { border-color: rgba(0,0,0,0.07) !important; }
+[data-theme="light"] .border-white\/8  { border-color: rgba(0,0,0,0.09) !important; }
+[data-theme="light"] .border-white\/10 { border-color: rgba(0,0,0,0.10) !important; }
+
+/* Form inputs */
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+  background-color: rgba(255,255,255,0.9) !important;
+  color: #0f172a !important;
+  border-color: rgba(0,0,0,0.12) !important;
+}
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder { color: #94a3b8 !important; }
+
+/* Nav header */
+[data-theme="light"] header {
+  background-color: rgba(241,245,249,0.88) !important;
+  border-color: rgba(0,0,0,0.08) !important;
+}
+
+/* Aurora overlay stays but lightens in light mode */
+[data-theme="light"] .aurora-overlay { opacity: 0.15; }
+
+
+/* Glassmorphism card styles */
+.glass-card {
+  background: rgba(10, 15, 30, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 208, 132, 0.25);
+  box-shadow: 0 0 25px rgba(0, 208, 132, 0.1);
+}
+
+/* Floating animation */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: float 6s ease-in-out infinite;
+  animation-delay: 3s;
+}
+
+/* Infinite horizontal slider */
+@keyframes infinite-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-infinite-scroll {
+  animation: infinite-scroll 45s linear infinite;
+}
+
+/* Pulse animation for glow orbs */
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.25; }
+  50% { transform: scale(1.15) translate(40px, -30px); opacity: 0.45; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 14s ease-in-out infinite;
+}
+
+.animate-pulse-slow-reverse {
+  animation: pulse-slow 18s ease-in-out infinite reverse;
+}
+
+/* Scroll snap utilities */
+.scroll-snap-x {
+  scroll-snap-type: x mandatory;
+}
+
+.scroll-snap-align-start {
+  scroll-snap-align: start;
+}
+
+/* Hide default scrollbars but allow scrolling */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
