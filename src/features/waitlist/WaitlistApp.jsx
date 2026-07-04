@@ -19,10 +19,11 @@ import {
   Sun03Icon
 } from '@hugeicons/core-free-icons';
 
-import { joinWaitlist, generateReferralLink } from '../../services/api/waitlist.service';
-import { validateWaitlistForm } from '../../utils/waitlist.validation';
+import { generateReferralLink } from '../../utils/helpers';
+import { validateWaitlistForm } from '../../utils/validators';
 import { analytics } from '../../services/analytics/analytics.service';
-import { UNIVERSITIES } from '../../utils/waitlist.constants';
+import { useWaitlist } from '../../hooks/useWaitlist';
+import { useUniversities } from '../../hooks/useUniversities';
 
 
 // Hardcoded future launch date
@@ -118,8 +119,11 @@ export default function WaitlistApp({ triggerToast }) {
     category: 'electronics'
   });
   const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  const { join, loading, error: joinError } = useWaitlist();
+  const { getAll: getUniversities } = useUniversities();
+  const UNIVERSITIES = getUniversities();
   const [joined, setJoined] = useState(false);
+  const [alreadyJoined, setAlreadyJoined] = useState(false);
   const [waitlistCount, setWaitlistCount] = useState(1482);
   const [queuePosition, setQueuePosition] = useState(0);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -210,7 +214,6 @@ export default function WaitlistApp({ triggerToast }) {
       return;
     }
 
-    setLoading(true);
     analytics.trackCtaClicked("join_waitlist_submit", "home");
 
     try {
@@ -218,23 +221,28 @@ export default function WaitlistApp({ triggerToast }) {
         ...formData,
         referralCode: referralCode || undefined
       };
-      const user = await joinWaitlist(payload);
+      const user = await join(payload);
       setUserSession(user);
-      setQueuePosition(user.queuePosition);
+      setQueuePosition(user.queue_position ?? 1);
+      setAlreadyJoined(user.already_joined === true);
       setJoined(true);
-      
-      analytics.trackWaitlistJoined(user.email, user.university, user.queuePosition, user.referralCode);
-      triggerToast(`Welcome to the UniVerse, ${user.name.split(' ')[0]}!`);
+
+      analytics.trackWaitlistJoined(user.email, user.university, user.queue_position ?? 1, user.referral_code);
+      const displayName = user.first_name || formData.name.split(' ')[0] || 'there';
+      if (user.already_joined) {
+        triggerToast(`Welcome back, ${displayName}! You're already on the list.`, 'success');
+      } else {
+        triggerToast(`Welcome to the UniVerse, ${displayName}!`);
+      }
     } catch (err) {
       setErrors({ form: err.message });
       triggerToast(err.message, "error");
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleCopyLink = () => {
-    const refCode = userSession?.referralCode || `UNI-${queuePosition}`;
+    // Supabase returns snake_case: referral_code (not referralCode)
+    const refCode = userSession?.referral_code || `UNI-${queuePosition}`;
     const link = generateReferralLink(refCode);
     
     navigator.clipboard.writeText(link);
@@ -461,13 +469,25 @@ export default function WaitlistApp({ triggerToast }) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <h3 className="text-2xl font-bold text-white font-display">You're on the list!</h3>
-                  <p className="text-xs text-slate-400">Welcome to the future of student trading.</p>
+                  {alreadyJoined ? (
+                    <>
+                      <h3 className="text-2xl font-bold text-white font-display">Already on the list!</h3>
+                      <p className="text-xs text-amber-400 font-semibold">This email has already joined the waitlist.</p>
+                      <p className="text-xs text-slate-400">Here's your existing queue spot and referral link.</p>
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="text-2xl font-bold text-white font-display">You're on the list!</h3>
+                      <p className="text-xs text-slate-400">Welcome to the future of student trading.</p>
+                    </>
+                  )}
                 </div>
 
                 {/* Simulated priority badge */}
                 <div className="bg-[#00D084]/5 rounded-2xl border border-[#00D084]/10 p-4.5 max-w-xs mx-auto space-y-1 shadow-[inset_0_0_10px_rgba(0,208,132,0.03)]">
-                  <span className="text-[9px] font-bold text-[#00D084] uppercase tracking-widest block">Your Queue Position</span>
+                  <span className="text-[9px] font-bold text-[#00D084] uppercase tracking-widest block">
+                    {alreadyJoined ? 'Your Original Queue Spot' : 'Your Queue Position'}
+                  </span>
                   <span className="text-3xl font-bold text-white font-display block">
                     #{queuePosition.toLocaleString()}
                   </span>
@@ -488,7 +508,7 @@ export default function WaitlistApp({ triggerToast }) {
                     <input 
                       type="text" 
                       readOnly 
-                      value={userSession?.referralCode ? generateReferralLink(userSession.referralCode) : `${window.location.origin}?ref=UNI-${queuePosition}`}
+                      value={userSession?.referral_code ? generateReferralLink(userSession.referral_code) : `${window.location.origin}?ref=UNI-${queuePosition}`}
                       className="bg-slate-950/60 border border-white/5 rounded-xl px-3.5 py-3 text-[11px] font-semibold text-slate-400 flex-1 outline-none text-left focus:border-[#00D084]/30"
                     />
                     <button 
@@ -587,7 +607,7 @@ export default function WaitlistApp({ triggerToast }) {
                   >
                     <option value="" className="bg-slate-900 text-slate-400">-- Choose Campus --</option>
                     {UNIVERSITIES.map((uni, idx) => (
-                      <option key={idx} value={uni} className="bg-slate-900 text-white">{uni}</option>
+                      <option key={idx} value={uni.name} className="bg-slate-900 text-white">{uni.name}</option>
                     ))}
                   </select>
                   {errors.university && <p className="text-[10px] text-rose-400 font-medium">{errors.university}</p>}

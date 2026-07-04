@@ -1,10 +1,3 @@
-import { UNIVERSITIES } from "./waitlist.constants";
-
-/**
- * Validates a waitlist registration form submission.
- * @param {Object} data - Form data containing name, email, university, role, category, and referralCode.
- * @returns {Object} { isValid: boolean, errors: Object }
- */
 export function validateWaitlistForm(data) {
   const errors = {};
 
